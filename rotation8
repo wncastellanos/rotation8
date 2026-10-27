@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rotación 8</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: sticky header with a step rail, one centered lesson card per step, sticky Back/Next bar at the bottom. */
+:root{
+  --bg:#eef2f8; --surface:#ffffff; --sunk:#f5f7fb; --ink:#152036; --muted:#566179; --line:#d6ddea;
+  --accent:#1d4ea0; --accent-ink:#ffffff; --accent-soft:#e3ebfa;
+  --sun:#f3a712; --sun-soft:#fff3d6; --sun-ink:#7a4a00;
+  --ok:#17744a; --ok-bg:#e2f5ea; --bad:#b3261e; --bad-bg:#fde8e6; --rev:#8a5a00; --rev-bg:#fff1d0;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1320; --surface:#172034; --sunk:#121a2b; --ink:#e7ecf5; --muted:#9ca7bd; --line:#2a3550;
+  --accent:#86a9ff; --accent-ink:#0e1320; --accent-soft:#1e2b4a;
+  --sun:#f6b93b; --sun-soft:#3a2c0e; --sun-ink:#ffd88a;
+  --ok:#62d29b; --ok-bg:#12301f; --bad:#ff8d84; --bad-bg:#3b1815; --rev:#ffcf70; --rev-bg:#382a0c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1320; --surface:#172034; --sunk:#121a2b; --ink:#e7ecf5; --muted:#9ca7bd; --line:#2a3550;
+  --accent:#86a9ff; --accent-ink:#0e1320; --accent-soft:#1e2b4a;
+  --sun:#f6b93b; --sun-soft:#3a2c0e; --sun-ink:#ffd88a;
+  --ok:#62d29b; --ok-bg:#12301f; --bad:#ff8d84; --bad-bg:#3b1815; --rev:#ffcf70; --rev-bg:#382a0c; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px 6px}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand-k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.brand-t{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.01em}
+.who{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who b{color:var(--ink)}
+.rail-wrap{max-width:820px;margin:0 auto;overflow-x:auto;scrollbar-width:thin}
+.rail{display:flex;gap:6px;padding-block:6px 10px;width:max-content}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--sunk);color:var(--muted);border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.chip .n{font-variant-numeric:tabular-nums;font-weight:700}
+.chip[disabled]{cursor:not-allowed;opacity:.55}
+.chip.done{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.chip.cur{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+main{padding-block:22px 110px}
+.step{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;display:flex;gap:10px;flex-wrap:wrap}
+.eyebrow .time{color:var(--muted);letter-spacing:.04em;text-transform:none;font-weight:400}
+h1,h2{font-family:var(--display);font-weight:800;letter-spacing:-.015em;line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,5vw,42px)}
+h2{font-size:clamp(26px,4vw,34px)}
+h3{font-family:var(--display);font-weight:600;font-size:20px;margin:0}
+p{margin:0}
+.lead{font-size:18px;color:var(--muted);max-width:62ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.note{background:var(--sun-soft);color:var(--sun-ink);border-radius:12px;padding:12px 16px}
+.rule{background:var(--accent-soft);border-radius:12px;padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.rule strong{color:var(--accent)}
+.es{font-style:italic}
+ul.clean,ol.clean{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.qlist{display:flex;flex-direction:column;gap:16px;margin:0;padding:0;list-style:none;counter-reset:q}
+.qlist>li{counter-increment:q;display:grid;grid-template-columns:2em 1fr;gap:4px 8px;align-items:baseline}
+.qlist>li::before{content:counter(q) ".";font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.qlist>li>*{grid-column:2;min-width:0}
+.sub{font-size:14px;color:var(--muted)}
+.prompt-en{font-weight:700}
+input.in,select.in,textarea{font:inherit;color:var(--ink);background:var(--sunk);border:2px solid var(--line);border-radius:8px;padding:4px 8px;max-width:100%}
+input.in{min-width:5ch}
+input.in.wide{width:100%!important;display:block;margin-top:4px}
+input.in:focus,select.in:focus,textarea:focus,button:focus-visible{outline:3px solid var(--sun);outline-offset:1px}
+.in.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.in.fixed{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.in.rev{border-color:var(--rev);background:var(--rev-bg);color:var(--rev)}
+.in.bad{border-color:var(--bad);background:var(--bad-bg)}
+.in[readonly],.in:disabled{opacity:1}
+.grp{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.grp-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:8px 18px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.warn{border-color:var(--rev);background:transparent;color:var(--rev)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.fb{font-size:15px;min-height:0}
+.fb.good{color:var(--ok);font-weight:700}
+.fb.try{color:var(--bad)}
+.fb ul{margin:4px 0 0;padding-left:1.2em;font-weight:400}
+.mcq{display:flex;flex-direction:column;gap:8px}
+.mc-q{font-weight:700}
+.mc-opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{font:inherit;background:var(--sunk);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:6px 14px;cursor:pointer;text-align:left}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:700}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);text-decoration:line-through}
+.opt[disabled]{cursor:default}
+.tbl-wrap{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:middle}
+th{background:var(--sunk);font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+td.subj{font-weight:700;white-space:nowrap}
+.end{background:var(--sun-soft);color:var(--sun-ink);font-weight:700;border-radius:4px;padding:0 2px}
+.prayer{columns:2 300px;column-gap:28px}
+.prayer p{break-inside:avoid;margin-bottom:10px}
+.vocab{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.voc{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--sunk);border-radius:10px;padding:8px 12px;min-width:0}
+.voc .w{font-weight:700}
+.voc .en{font-size:14px;color:var(--muted)}
+.say{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--accent);cursor:pointer;display:grid;place-items:center}
+.say svg{width:18px;height:18px}
+.no-tts .say{display:none}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;background:var(--sunk);border-radius:10px;padding:12px 16px}
+.facts dt{color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:.06em;align-self:center}
+.facts dd{margin:0;font-weight:700}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.sent{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.sent li{line-height:2.1}
+textarea{width:100%;min-height:150px;resize:vertical;line-height:1.6}
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px}
+.checks li{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--muted)}
+.checks .box{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:13px;font-weight:700}
+.checks li.yes{color:var(--ok)}
+.checks li.yes .box{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.bank{display:flex;flex-wrap:wrap;gap:6px}
+.bank span{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:15px}
+.steps4{counter-reset:s;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.steps4 li{counter-increment:s;background:var(--sunk);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.steps4 li::before{content:"Paso " counter(s);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.machine{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.machine label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+.mout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.mout div{border:1px dashed var(--line);border-radius:10px;padding:10px}
+.mout .k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.mout .v{font-family:var(--display);font-weight:600;font-size:20px}
+.mout .final{border-style:solid;border-color:var(--sun);background:var(--sun-soft)}
+.mout .final .v{color:var(--sun-ink);font-size:24px}
+.form{display:flex;flex-wrap:wrap;gap:14px;align-items:end}
+.form label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:15px}
+.form input,.form select{font:inherit;font-weight:400;padding:8px 10px;border:2px solid var(--line);border-radius:8px;background:var(--sunk);color:var(--ink)}
+.summary{border:3px solid var(--accent)}
+.sum-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.sum-name{font-family:var(--display);font-weight:800;font-size:26px}
+.sum-meta{color:var(--muted);font-size:15px}
+.sum-tbl td,.sum-tbl th{padding:4px 10px;font-size:15px}
+.sum-tbl td.num{text-align:right}
+.total{font-family:var(--display);font-weight:800;font-size:20px;color:var(--ok)}
+.profile-out{background:var(--sunk);border-radius:10px;padding:10px 14px;white-space:pre-wrap;font-size:15px}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.bot-in{max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
+.bot-msg{font-size:14px;color:var(--muted);text-align:center;flex:1;min-width:0}
+kbd{font-family:inherit;font-size:14px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 6px;background:var(--sunk)}
+@media (max-width:520px){.qlist>li{grid-template-columns:1.6em 1fr}.card{padding:16px}body{font-size:16px}}
+@media (prefers-reduced-motion:no-preference){.step{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in gut">
+    <div class="brand"><span class="brand-k">Español I</span><span class="brand-t">Rotación 8</span></div>
+    <div class="who" id="who"></div>
+  </div>
+  <div class="rail-wrap gut"><div class="rail" id="rail"></div></div>
+</header>
+<main class="gut" id="main"></main>
+<nav class="bottom">
+  <div class="bot-in gut">
+    <button class="btn ghost" id="back">← Atrás</button>
+    <div class="bot-msg" id="botmsg"></div>
+    <button class="btn" id="next">Siguiente →</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+"use strict";
+/* ---------- state ---------- */
+var KEY="rot8-espanol1-v1";
+var S={name:"",period:"",step:0,max:0,f:{},mc:{},g:{},profile:"",finished:""};
+try{var raw=localStorage.getItem(KEY); if(raw){var o=JSON.parse(raw); if(o&&typeof o==="object"){for(var k in o)S[k]=o[k];}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ---------- helpers ---------- */
+var DAYS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+var DAYS_ORDER=["lunes","martes","miércoles","jueves","viernes","sábado","domingo"];
+var today=new Date(), dIdx=today.getDay();
+var AYER=DAYS[(dIdx+6)%7], HOY=DAYS[dIdx], MANANA=DAYS[(dIdx+1)%7];
+var PRON=/^(yo|tu|el|ella|usted|nosotros|nosotras|ellos|ellas|ustedes)\s+/;
+function norm(s,keepAcc,pro){
+  s=String(s||"").toLowerCase().replace(/[¿?¡!.,;:"“”'’()]/g," ").replace(/\s+/g," ").trim();
+  if(!keepAcc) s=s.normalize("NFD").replace(/[̀-ͯ]/g,"");
+  if(pro) s=s.replace(keepAcc?/^(yo|tú|tu|él|el|ella|usted|nosotros|nosotras|ellos|ellas|ustedes)\s+/:PRON,"");
+  return s;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function done(s){return s==="correct"||s==="fixed"||s==="revealed";}
+var SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+function say(t){return '<button class="say" type="button" data-say="'+esc(t)+'" aria-label="Escuchar: '+esc(t)+'">'+SPK+'</button>';}
+var hasTTS=("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window);
+if(!hasTTS) document.documentElement.classList.add("no-tts");
+function speak(t){
+  if(!hasTTS) return;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="es-MX";u.rate=.85;
+    var vs=speechSynthesis.getVoices()||[];var v=vs.find(function(x){return /^es[-_](MX|US)/i.test(x.lang);})||vs.find(function(x){return /^es/i.test(x.lang);});
+    if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}
+}
+
+/* ---------- registries ---------- */
+var F={}, MC={}, CUR_G=null;
+function G(id){CUR_G=id;return "";}
+function f(id,answers,o){o=o||{};F[id]={answers:[].concat(answers),g:CUR_G};for(var k in o)F[id][k]=o[k];return '<span class="fld" data-f="'+id+'"></span>';}
+function sel(id,options,answer,o){o=o||{};F[id]={answers:[answer],options:options,type:"select",g:CUR_G};for(var k in o)F[id][k]=o[k];return '<span class="fld" data-f="'+id+'"></span>';}
+function grp(id){return '<div class="grp" data-g="'+id+'"></div>';}
+function mc(id,q,options,correct,why){MC[id]={q:q,options:options,correct:correct,why:why||""};return '<div class="mcq" data-mc="'+id+'"></div>';}
+
+function chartHTML(gid,cols,subjects,forms){
+  G(gid);
+  var h='<div class="tbl-wrap"><table><thead><tr><th>Sujeto</th>';
+  cols.forEach(function(c){h+='<th>'+c+'</th>';});
+  h+='</tr></thead><tbody>';
+  subjects.forEach(function(s,i){
+    h+='<tr><td class="subj">'+s+'</td>';
+    cols.forEach(function(c,j){h+='<td>'+f(gid+"_"+i+"_"+j,forms[j][i],{label:s+" "+c})+'</td>';});
+    h+='</tr>';
+  });
+  return h+'</tbody></table></div>'+grp(gid);
+}
+function modelChart(verbs){
+  var subs=["yo","tú","él / ella / usted","nosotros/as","ellos / ellas / ustedes"];
+  var h='<div class="tbl-wrap"><table><thead><tr><th></th>';
+  verbs.forEach(function(v){h+='<th>'+v.inf+' <span class="sub" style="text-transform:none;letter-spacing:0">('+v.en+')</span></th>';});
+  h+='</tr></thead><tbody>';
+  subs.forEach(function(s,i){
+    h+='<tr><td class="subj">'+s+'</td>';
+    verbs.forEach(function(v){var e=ENDS[v.inf.slice(-2)][i];h+='<td>'+v.inf.slice(0,-2)+'<span class="end">'+e+'</span></td>';});
+    h+='</tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+var ENDS={ar:["o","as","a","amos","an"],er:["o","es","e","emos","en"],ir:["o","es","e","imos","en"]};
+function conj(inf,i){return inf.slice(0,-2)+ENDS[inf.slice(-2)][i];}
+function forms(inf){return [0,1,2,3,4].map(function(i){return conj(inf,i);});}
+
+/* ---------- steps ---------- */
+var STEPS=[];
+function step(o){STEPS.push(o);}
+
+step({id:"inicio",title:"Inicio",min:2,html:function(){return ''+
+ '<div class="eyebrow">Lección en línea<span class="time">Español I · Rotación 8</span></div>'+
+ '<h1>¡Hola! Today you work on your own.</h1>'+
+ '<p class="lead">This lesson reviews <span class="es">tener</span>, practices occupations and profiles, and teaches you how to conjugate regular <b>-ar, -er, -ir</b> verbs. It ends with practice for <b>Quiz 2 on tener</b>, which is next class.</p>'+
+ '<div class="card"><h3>How it works</h3><ul class="clean">'+
+ '<li>Go through the steps in order. <b>Siguiente</b> unlocks when you finish a step.</li>'+
+ '<li>Type your answer and press <b>Revisar</b> or <kbd>Enter</kbd>. Missing accents won\'t count against you, but the page will remind you.</li>'+
+ '<li>You get <b>2 tries</b>. After that you can see the answer. Read it carefully before you move on.</li>'+
+ '<li>Keep your notebook out and copy anything you want to study.</li>'+
+ '<li>At the end you take a <b>screenshot</b> and upload it to Canvas.</li></ul></div>'+
+ '<div class="card"><h3>Who are you?</h3><div class="form">'+
+ '<label for="nm">Nombre y apellido<input id="nm" autocomplete="off" placeholder="First and last name" value="'+esc(S.name)+'"></label>'+
+ '<label for="pd">Período<select id="pd"><option value="">—</option><option'+(S.period==="1"?" selected":"")+'>1</option><option'+(S.period==="5"?" selected":"")+'>5</option><option'+(S.period==="6"?" selected":"")+'>6</option></select></label>'+
+ '</div><p class="sub">Use your real name. Your teacher will see it on your screenshot.</p></div>';},
+ after:function(root){
+   var nm=root.querySelector("#nm"), pd=root.querySelector("#pd");
+   nm.addEventListener("input",function(){S.name=nm.value.trim();save();refresh();});
+   pd.addEventListener("change",function(){S.period=pd.value;save();refresh();});
+ },
+ ready:function(){return S.name.length>=2&&!!S.period;},
+ why:"Escribe tu nombre y elige tu período."
+});
+
+step({id:"oracion",title:"Oración y fecha",min:5,html:function(){return ''+
+ '<h2>La oración y la fecha</h2>'+
+ '<p class="lead">Pray together as a class first. Then answer the date questions on your own.</p>'+
+ '<div class="card"><h3>Intenciones especiales</h3><p>Think of someone you want to pray for. <span class="es">Por mi familia · Por mis amigas · Por los enfermos · Por mi abuela…</span></p>'+
+ '<div class="prayer"><p><b>La Señal de la Cruz</b><br><span class="es">En el nombre del Padre, y del Hijo, y del Espíritu Santo. Amén.</span></p>'+
+ '<p><b>El Padre Nuestro</b><br><span class="es">Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal. Amén.</span></p></div></div>'+
+ G("fecha")+
+ '<div class="card"><h3>La fecha</h3><ul class="sent">'+
+ '<li><b>Ayer fue</b> '+sel("ayer",DAYS_ORDER,AYER,{label:"Ayer fue"})+'. <span class="sub">(Yesterday was)</span></li>'+
+ '<li><b>Hoy es</b> '+sel("hoy",DAYS_ORDER,HOY,{label:"Hoy es"})+'. <span class="sub">(Today is)</span></li>'+
+ '<li><b>Mañana es</b> '+sel("manana",DAYS_ORDER,MANANA,{label:"Mañana es"})+'. <span class="sub">(Tomorrow is)</span></li></ul>'+grp("fecha")+'</div>';}
+});
+
+step({id:"calentamiento",title:"Calentamiento",min:6,html:function(){return ''+
+ '<h2>Calentamiento</h2><p class="lead">Warm up with what you already know about <span class="es">tener</span>.</p>'+
+ G("cal")+
+ '<div class="card"><ol class="qlist">'+
+ '<li><p>Ella '+f("c1","tiene",{label:"tener, ella"})+' (tener) catorce años.</p></li>'+
+ '<li><p>Nosotras '+f("c2","tenemos",{label:"tener, nosotras"})+' (tener) que estudiar.</p></li>'+
+ '<li><p class="prompt-en">Translate: I have to do the homework.</p>'+f("c3",["Tengo que hacer la tarea","Tengo que hacer mi tarea","Tengo que hacer tarea"],{wide:1,pro:1,hint:"Use tengo que + a verb in its basic form. Homework = la tarea. To do = hacer."})+'</li>'+
+ '<li><p class="prompt-en">Answer in Spanish: ¿Qué tienes que hacer esta noche? <span class="sub">(What do you have to do tonight?)</span></p>'+
+   f("c4",["Tengo que estudiar."],{wide:1,validate:function(v){return /\btengo que [a-z]+(ar|er|ir)\b/.test(norm(v));},hint:"Start with Tengo que… and add a verb ending in -ar, -er or -ir. Example: Tengo que estudiar."})+'</li>'+
+ '</ol>'+grp("cal")+'</div>'+
+ '<div class="card">'+mc("c5","5. What is an infinitive?",["The basic form of a verb, ending in -ar, -er or -ir (“to ___”)","The yo form of a verb","A word that describes a noun"],0,"Right. Hablar = to speak, comer = to eat, vivir = to live. After tener que, the verb stays in this form.")+'</div>';}
+});
+
+step({id:"repaso",title:"Repaso de tener",min:8,html:function(){return ''+
+ '<h2>Repaso: ser, tener y llamarse</h2><p class="lead">Fill in the chart from memory. No peeking at your notes first. Try it, then check.</p>'+
+ '<div class="card">'+chartHTML("chart",["SER","TENER","LLAMARSE"],["yo","tú","él / ella / usted","nosotros/as","vosotros/as","ellos / ellas / ustedes"],[
+   ["soy","eres","es","somos","sois","son"],
+   ["tengo","tienes","tiene","tenemos","tenéis","tienen"],
+   ["me llamo","te llamas","se llama","nos llamamos","os llamáis","se llaman"]])+
+ '<p class="sub">Vosotros is used in Spain. You still need to recognize it.</p></div>'+
+ '<div class="rule"><h3>Negative tener</h3><p>To make a sentence negative, put <strong>no</strong> right before the verb.</p>'+
+ '<ul class="clean"><li><span class="es">No tengo hambre.</span> — I\'m not hungry.</li><li><span class="es">Ella no tiene sed.</span> — She isn\'t thirsty.</li><li><span class="es">No tenemos que estudiar hoy.</span> — We don\'t have to study today.</li><li><span class="es">¿No tienes frío?</span> — Aren\'t you cold?</li></ul></div>'+
+ '<div class="card">'+mc("neg0","Where does no go?",["Right before tener","At the end of the sentence","Right after tener"],0,"Yes. Subject + no + tener: Ella no tiene sed.")+'</div>'+
+ G("neg")+
+ '<div class="card"><h3>Make each sentence negative</h3><ol class="qlist">'+
+ '<li><p class="es">Tengo frío.</p>'+f("n1",["No tengo frío"],{wide:1,pro:1,hint:"Put no in front of tengo."})+'</li>'+
+ '<li><p class="es">Ellas tienen que trabajar.</p>'+f("n2",["Ellas no tienen que trabajar"],{wide:1,pro:1,hint:"Ellas + no + tienen…"})+'</li>'+
+ '<li><p class="es">Tú tienes sueño.</p>'+f("n3",["Tú no tienes sueño"],{wide:1,pro:1,hint:"Tú + no + tienes…"})+'</li>'+
+ '</ol>'+grp("neg")+'</div>';}
+});
+
+step({id:"traducir",title:"Traducir",min:7,html:function(){return ''+
+ '<h2>Traducir las frases</h2><p class="lead">Translate each sentence into Spanish. Remember: in Spanish you <b>have</b> hunger, cold and fear.</p>'+
+ '<div class="note"><b>Expresiones con tener:</b> tener hambre (hungry) · tener sed (thirsty) · tener sueño (sleepy) · tener frío (cold) · tener calor (hot) · tener miedo (afraid) · tener prisa (in a hurry) · tener que + verb (to have to)</div>'+
+ G("tr")+
+ '<div class="card"><ol class="qlist">'+
+ '<li><p class="prompt-en">I am not hungry.</p>'+f("t1",["No tengo hambre"],{wide:1,pro:1,hint:"I am not hungry = I don\'t have hunger. Start with No…"})+'</li>'+
+ '<li><p class="prompt-en">Laura has to work.</p>'+f("t2",["Laura tiene que trabajar"],{wide:1,hint:"Laura is ella, so use tiene. To work = trabajar."})+'</li>'+
+ '<li><p class="prompt-en">Pablo is hungry.</p>'+f("t3",["Pablo tiene hambre"],{wide:1,hint:"Pablo has hunger."})+'</li>'+
+ '<li><p class="prompt-en">We have to go to Mass.</p>'+f("t4",["Tenemos que ir a misa","Tenemos que ir a la misa"],{wide:1,pro:1,hint:"We = tenemos. To go = ir. Mass = misa."})+'</li>'+
+ '<li><p class="prompt-en">Sandra is afraid.</p>'+f("t5",["Sandra tiene miedo"],{wide:1,hint:"Sandra has fear (miedo)."})+'</li>'+
+ '<li><p class="prompt-en">You don\'t have to write.</p>'+f("t6",["No tienes que escribir","No tiene que escribir","No tienen que escribir"],{wide:1,pro:1,hint:"You (tú) = tienes. To write = escribir. Where does no go?"})+'</li>'+
+ '<li><p class="prompt-en">We are not cold.</p>'+f("t7",["No tenemos frío"],{wide:1,pro:1,hint:"We don\'t have cold (frío)."})+'</li>'+
+ '</ol>'+grp("tr")+'</div>';}
+});
+
+var OCC=[["estudiante","estudiante","student"],["profesor","profesora","teacher"],["doctor","doctora","doctor"],["enfermero","enfermera","nurse"],["abogado","abogada","lawyer"],["ingeniero","ingeniera","engineer"],["cocinero","cocinera","cook / chef"],["escritor","escritora","writer"],["cantante","cantante","singer"],["actor","actriz","actor / actress"],["tenista","tenista","tennis player"],["futbolista","futbolista","soccer player"],["policía","policía","police officer"],["artista","artista","artist"]];
+step({id:"ocupaciones",title:"Ocupaciones",min:7,html:function(){
+ var v=OCC.map(function(o){var w=o[0]===o[1]?o[0]:o[0]+" / "+o[1];return '<div class="voc"><div><div class="w">'+w+'</div><div class="en">'+o[2]+'</div></div>'+say(o[0]===o[1]?"el "+o[0]+", la "+o[1]:"el "+o[0]+". la "+o[1])+'</div>';}).join("");
+ return '<h2>Ocupaciones</h2><p class="lead">Read each job out loud (quietly). Press the speaker to hear it, using headphones or low volume.</p>'+
+ '<div class="card"><div class="vocab">'+v+'</div>'+
+ '<div class="rule"><p><strong>Masculine and feminine:</strong> words ending in <b>-o</b> change to <b>-a</b> for a woman (enfermer<span class="end">o</span> → enfermer<span class="end">a</span>). Words ending in <b>-e</b> or <b>-ista</b> stay the same (la cantante, la tenista). To say what someone does, use <b>ser</b>: <span class="es">Ella es doctora.</span> No word for “a” is needed.</p></div></div>'+
+ '<div class="card"><h3>¿Quién es?</h3><p class="sub">Read the clue and choose the job. The verb in parentheses is translated for you.</p>'+
+ mc("o1","1. Ella trabaja (works) en un hospital y ayuda (helps) a los pacientes. Es…",["enfermera","abogada","cantante"],0,"Enfermera = nurse.")+
+ mc("o2","2. Ella canta (sings) en conciertos. Es…",["escritora","cantante","ingeniera"],1,"Cantante stays the same for men and women.")+
+ mc("o3","3. Ella enseña (teaches) español en una escuela. Es…",["policía","futbolista","profesora"],2,"Profesora, just like your Spanish teacher.")+
+ mc("o4","4. Ella juega (plays) al tenis en el US Open. Es…",["tenista","cocinera","actriz"],0,"Tenista, like Coco Gauff.")+
+ mc("o5","5. Ella prepara (prepares) comida en un restaurante. Es…",["estudiante","abogada","cocinera"],2,"Cocinera = cook or chef.")+
+ mc("o6","6. Él escribe (writes) libros. Es…",["escritora","escritor","artista"],1,"Él is a man, so escritor. A woman would be escritora.")+
+ mc("o7","7. Él actúa (acts) en películas. Es…",["actriz","tenista","actor"],2,"Actor for a man, actriz for a woman.")+
+ mc("o8","8. Ella defiende (defends) a personas en la corte. Es…",["abogado","abogada","enfermera"],1,"Ella, so abogada with -a.")+
+ '</div>';}
+});
+
+step({id:"perfiles",title:"¿Quién es?",min:6,html:function(){return ''+
+ '<h2>¿Quién es?</h2><p class="lead">Use <b>se llama</b>, <b>tiene</b> and <b>es</b> to describe another person.</p>'+
+ G("coco")+
+ '<div class="card"><h3>Coco Gauff</h3><dl class="facts"><dt>Nombre</dt><dd>Coco Gauff</dd><dt>Edad</dt><dd>22 años</dd><dt>Ocupación</dt><dd>tenista</dd><dt>Origen</dt><dd>Florida</dd><dt>Ahora</dt><dd>practicar tenis</dd></dl>'+
+ '<p>Choose the right word for each sentence.</p><ul class="sent">'+
+ '<li>'+sel("k1",["Me","Te","Se"],"Se")+' llama Coco Gauff.</li>'+
+ '<li>'+sel("k2",["Tengo","Tiene","Es"],"Tiene")+' veintidós años.</li>'+
+ '<li>'+sel("k3",["Soy","Tiene","Es"],"Es")+' tenista.</li>'+
+ '<li>'+sel("k4",["Tiene","Es","Somos"],"Es")+' de Florida.</li>'+
+ '<li>Ahora '+sel("k5",["es","tienes","tiene"],"tiene")+' que practicar tenis.</li></ul>'+grp("coco")+'</div>'+
+ G("sofia")+
+ '<div class="card"><h3>Sofía Ramírez</h3><dl class="facts"><dt>Edad</dt><dd>35 años</dd><dt>Ocupación</dt><dd>doctora</dd><dt>Origen</dt><dd>Monterrey, México</dd><dt>Hoy</dt><dd>trabajar en el hospital</dd><dt>Ahora</dt><dd>hambre</dd></dl>'+
+ '<p>Now type the missing word yourself.</p><ul class="sent">'+
+ '<li>'+f("s1","Se")+' llama Sofía Ramírez.</li>'+
+ '<li>'+f("s2","Tiene")+' treinta y cinco años.</li>'+
+ '<li>'+f("s3","Es")+' doctora.</li>'+
+ '<li>'+f("s4","Es")+' de Monterrey, México.</li>'+
+ '<li>Hoy '+f("s5","tiene")+' que trabajar en el hospital.</li>'+
+ '<li>Ahora '+f("s6","tiene")+' hambre.</li></ul>'+grp("sofia")+'</div>'+
+ '<div class="card"><h3>Lee y contesta</h3><p class="es" style="background:var(--sunk);padding:12px 16px;border-radius:10px">Hola. Me llamo Daniela. Tengo trece años. Soy de Baton Rouge. Soy estudiante. Hoy tengo sueño porque tengo que estudiar mucho.</p>'+
+ mc("d1","¿Cuántos años tiene Daniela?",["30","13","3"],1,"Trece = 13.")+
+ mc("d2","¿De dónde es Daniela?",["Nueva Orleans","Lafayette","Baton Rouge"],2,"Soy de Baton Rouge.")+
+ mc("d3","¿Por qué tiene sueño?",["Tiene que estudiar mucho.","Tiene hambre.","Tiene que trabajar."],0,"Porque = because.")+
+ '</div>';}
+});
+
+var PCHECKS=[
+ ["name","Me llamo…",function(t){return /\bme llamo [a-z]+/.test(t)||/\bmi nombre es [a-z]+/.test(t);}],
+ ["age","Tengo ___ años.",function(t){return /\btengo [a-z0-9]+( y [a-z]+)? anos\b/.test(t);}],
+ ["occ","Soy + occupation",function(t){return /\bsoy (?!de\b)[a-z]+/.test(t);}],
+ ["from","Soy de…",function(t){return /\bsoy de [a-z]+/.test(t);}],
+ ["feel","Tengo + hambre, sueño, frío…",function(t){return /\b(tengo|no tengo) (mucho |mucha )?(hambre|sed|sueno|frio|calor|miedo|prisa|razon|suerte)\b/.test(t);}],
+ ["que","Esta noche tengo que + verb",function(t){return /\btengo que [a-z]+(ar|er|ir)\b/.test(t);}]
+];
+function profileOK(){var t=norm(S.profile);return PCHECKS.every(function(c){return c[2](t);});}
+step({id:"tuperfil",title:"¿Quién eres tú?",min:7,html:function(){return ''+
+ '<h2>¿Quién eres tú?</h2><p class="lead">Write your own profile in complete Spanish sentences. The checklist fills in as you write.</p>'+
+ '<div class="two"><div class="card"><h3>Sentence starters</h3><ul class="clean es"><li>Me llamo…</li><li>Tengo ___ años.</li><li>Soy ___ . <span class="sub">(estudiante)</span></li><li>Soy de…</li><li>Ahora tengo ___ . <span class="sub">(sueño, hambre…)</span></li><li>Esta noche tengo que…</li></ul></div>'+
+ '<div class="card"><h3>Banco de palabras</h3><div class="bank"><span>trece</span><span>catorce</span><span>quince</span><span>estudiante</span><span>hambre</span><span>sed</span><span>sueño</span><span>frío</span><span>calor</span><span>prisa</span><span>estudiar</span><span>comer</span><span>leer</span><span>escribir</span><span>practicar</span><span>dormir</span><span>hacer la tarea</span></div></div></div>'+
+ '<div class="card"><h3><label for="profile">Mi perfil</label></h3><textarea id="profile" placeholder="Me llamo Julia. Tengo catorce años…">'+esc(S.profile)+'</textarea>'+
+ '<ul class="checks" id="pchecks">'+PCHECKS.map(function(c){return '<li data-c="'+c[0]+'"><span class="box"></span>'+c[1]+'</li>';}).join("")+'</ul>'+
+ '<p class="sub">Your profile will appear on your final screenshot, so make it your best work.</p></div>';},
+ after:function(root){
+   var ta=root.querySelector("#profile");
+   function upd(){var t=norm(S.profile);PCHECKS.forEach(function(c){root.querySelector('[data-c="'+c[0]+'"]').classList.toggle("yes",c[2](t));});root.querySelectorAll(".checks .box").forEach(function(b){b.textContent=b.parentNode.classList.contains("yes")?"✓":"";});}
+   ta.addEventListener("input",function(){S.profile=ta.value;save();upd();refresh();});
+   upd();
+ },
+ ready:profileOK,
+ why:"Your profile needs all six sentences on the checklist."
+});
+
+var MVERBS=[["hablar","to speak"],["practicar","to practice"],["estudiar","to study"],["bailar","to dance"],["cantar","to sing"],["comer","to eat"],["leer","to read"],["beber","to drink"],["correr","to run"],["vivir","to live"],["escribir","to write"],["abrir","to open"]];
+var MSUBJ=["yo","tú","él / ella / usted","nosotros/as","ellos / ellas / ustedes"];
+step({id:"verbos",title:"Verbos nuevos",min:8,html:function(){return ''+
+ '<h2>Verbos nuevos: -ar, -er, -ir</h2><p class="lead">Most Spanish verbs follow a pattern. Once you learn the pattern, you can conjugate hundreds of verbs. Go slowly here. This is new.</p>'+
+ '<div class="card"><h3>The infinitive</h3><p>The <b>infinitive</b> is the basic form of a verb. In English it starts with “to.” In Spanish it ends in <b>-ar</b>, <b>-er</b> or <b>-ir</b>.</p>'+
+ '<p><span class="es">habl<span class="end">ar</span></span> = to speak · <span class="es">com<span class="end">er</span></span> = to eat · <span class="es">viv<span class="end">ir</span></span> = to live</p>'+
+ '<p>To <b>conjugate</b> means to change the verb so it matches who is doing the action.</p></div>'+
+ '<div class="card"><h3>4 steps to conjugate</h3><ol class="steps4"><li><b>Find the subject.</b> Who is doing it? <span class="es">yo</span></li><li><b>Find the ending.</b> Is it -ar, -er or -ir? <span class="es">hablar → -ar</span></li><li><b>Drop the ending.</b> Keep the stem. <span class="es">habl-</span></li><li><b>Add the new ending.</b> Use the chart. <span class="es">habl + o = hablo</span></li></ol>'+
+ '<div class="tbl-wrap"><table><thead><tr><th></th><th>-AR</th><th>-ER</th><th>-IR</th></tr></thead><tbody>'+
+ MSUBJ.map(function(s,i){return '<tr><td class="subj">'+s+'</td><td><span class="end">-'+ENDS.ar[i]+'</span></td><td><span class="end">-'+ENDS.er[i]+'</span></td><td><span class="end">-'+ENDS.ir[i]+'</span></td></tr>';}).join("")+
+ '</tbody></table></div><p class="sub">Notice: -er and -ir are the same except for nosotros (-emos / -imos). Copy this chart into your notebook.</p></div>'+
+ '<div class="card"><h3>La máquina de verbos</h3><p>Pick a verb and a subject and watch the 4 steps happen.</p>'+
+ '<div class="machine"><label for="mv">Verbo<select id="mv" class="in">'+MVERBS.map(function(v){return '<option value="'+v[0]+'">'+v[0]+' ('+v[1]+')</option>';}).join("")+'</select></label>'+
+ '<label for="ms">Sujeto<select id="ms" class="in">'+MSUBJ.map(function(s,i){return '<option value="'+i+'">'+s+'</option>';}).join("")+'</select></label></div>'+
+ '<div class="mout" id="mout"></div></div>'+
+ '<div class="card"><h3>Ejemplos</h3>'+modelChart([{inf:"practicar",en:"to practice"},{inf:"leer",en:"to read"},{inf:"escribir",en:"to write"}])+
+ '<div class="rule"><p><strong>Key point:</strong> after <span class="es">tener que</span>, the second verb does <b>not</b> change. It stays in the infinitive.</p><p><span class="es">Leo un libro.</span> (I read a book.) · <span class="es">Tengo que leer un libro.</span> (I have to read a book.)</p></div></div>'+
+ '<div class="card"><h3>Check yourself</h3>'+
+ mc("v1","Yo + comer = ?",["come","comer","como","comemos"],2,"Drop -er → com-, add -o → como.")+
+ mc("v2","Ellas + escribir = ?",["escribimos","escriben","escribe","escribir"],1,"Ellas uses -en for -ir verbs → escriben.")+
+ mc("v3","Nosotros + estudiar: what do you drop first?",["-ar","estud-","nosotros"],0,"Drop the -ar, keep estudi-, then add -amos → estudiamos.")+
+ '</div>';},
+ after:function(root){
+   var mv=root.querySelector("#mv"),ms=root.querySelector("#ms"),out=root.querySelector("#mout");
+   function upd(){var v=mv.value,i=+ms.value,end=v.slice(-2),stem=v.slice(0,-2);
+     out.innerHTML='<div><div class="k">1 · Sujeto</div><div class="v">'+MSUBJ[i]+'</div></div><div><div class="k">2 · Terminación</div><div class="v">-'+end+'</div></div><div><div class="k">3 · Raíz</div><div class="v">'+stem+'-</div></div><div class="final"><div class="k">4 · Nueva forma</div><div class="v">'+stem+'<span class="end">'+ENDS[end][i]+'</span></div></div>';}
+   mv.addEventListener("change",upd);ms.addEventListener("change",upd);upd();
+ }
+});
+
+step({id:"practica",title:"Práctica de verbos",min:10,html:function(){return ''+
+ '<h2>Práctica de verbos</h2><p class="lead">Conjugate each verb for every subject. Use the 4 steps.</p>'+
+ '<div class="card">'+chartHTML("vt",["estudiar","comer","vivir"],MSUBJ,[forms("estudiar"),forms("comer"),forms("vivir")])+'</div>'+
+ '<div class="card"><h3>¿Cambia o no cambia?</h3><p class="sub">Does the verb change, or stay as an infinitive after tener que?</p>'+
+ mc("tq1","Tengo que ___ un libro.",["leo","leer"],1,"After tener que, use the infinitive: leer.")+
+ mc("tq2","Ella ___ un libro.",["lee","leer"],0,"No tener que here, so conjugate: ella lee.")+
+ mc("tq3","Nosotras tenemos que ___ en español.",["escribimos","escribir"],1,"Tenemos que + infinitive: escribir.")+
+ mc("tq4","Yo ___ en mi cuaderno todos los días.",["escribo","escribir"],0,"Conjugate for yo: escribo.")+
+ '</div>'+
+ G("vs")+
+ '<div class="card"><h3>Completa la frase</h3><ul class="sent">'+
+ '<li>Yo '+f("p1","hablo")+' (hablar) español en clase.</li>'+
+ '<li>Mi hermana '+f("p2","baila")+' (bailar) muy bien.</li>'+
+ '<li>Nosotras '+f("p3","bebemos")+' (beber) agua.</li>'+
+ '<li>Tú '+f("p4","corres")+' (correr) en el parque.</li>'+
+ '<li>Ellas '+f("p5","abren")+' (abrir) la puerta.</li>'+
+ '<li>Usted '+f("p6","escucha")+' (escuchar) música.</li></ul>'+grp("vs")+'</div>';}
+});
+
+step({id:"prueba",title:"Práctica para la prueba",min:8,html:function(){return ''+
+ '<h2>Práctica para la Prueba 2</h2><p class="lead"><b>Quiz 2 on tener is next class.</b> This practice is like the quiz. Anything you miss here, write in your notebook to study tonight. All study resources are on Canvas.</p>'+
+ G("pq")+
+ '<div class="card"><h3>Escribe la forma correcta de tener</h3><ul class="sent">'+
+ '<li>Yo '+f("q1","tengo")+' quince años.</li>'+
+ '<li>¿Tú '+f("q2","tienes")+' sed?</li>'+
+ '<li>Mis amigas '+f("q3","tienen")+' que estudiar.</li>'+
+ '<li>Usted '+f("q4","tiene")+' razón.</li>'+
+ '<li>Mi familia y yo '+f("q5","tenemos")+' que ir a misa.</li></ul>'+
+ '<h3>Traduce</h3><ol class="qlist">'+
+ '<li><p class="prompt-en">She is sleepy.</p>'+f("q6",["Ella tiene sueño"],{wide:1,pro:1,hint:"She has sleep (sueño)."})+'</li>'+
+ '<li><p class="prompt-en">I don\'t have to work.</p>'+f("q7",["No tengo que trabajar"],{wide:1,pro:1,hint:"No + tengo que + trabajar."})+'</li>'+
+ '</ol>'+grp("pq")+'</div>'+
+ '<div class="card"><h3>Escoge la respuesta</h3>'+
+ mc("q8","“Tengo prisa” means…",["I\'m hungry.","I\'m in a hurry.","I\'m afraid."],1,"Prisa = hurry.")+
+ mc("q9","“Tenemos calor” means…",["We are hot.","We are cold.","We are right."],0,"Calor = heat, so we are hot.")+
+ mc("q10","Which one says “She is 14”?",["Ella es catorce años.","Ella tiene catorce años.","Ella está catorce años."],1,"Age always uses tener: tiene … años.")+
+ mc("q11","Your friend says: “Tengo sed.” What is the best answer?",["Tienes que dormir.","Tienes que estudiar.","Tienes que beber agua."],2,"Thirsty → drink water.")+
+ '</div>';}
+});
+
+step({id:"final",title:"¡Terminaste!",min:2,html:function(){return '<div id="finalbox"></div>';},after:function(root){renderFinal(root.querySelector("#finalbox"));}});
+
+/* ---------- build all sections ---------- */
+var main=document.getElementById("main"), SECTIONS=[];
+STEPS.forEach(function(s,i){
+  var sec=document.createElement("section");sec.className="step";sec.dataset.i=i;sec.hidden=true;
+  var head=(i>0&&i<STEPS.length-1)?'<div class="eyebrow">Paso '+i+' de '+(STEPS.length-2)+'<span class="time">about '+s.min+' min</span></div>':"";
+  sec.innerHTML=head+s.html();
+  main.appendChild(sec);SECTIONS.push(sec);
+});
+SECTIONS.forEach(function(sec){hydrate(sec);});
+STEPS.forEach(function(s,i){if(s.after&&s.id!=="final")s.after(SECTIONS[i]);});
+
+function ensure(id){return S.f[id]||(S.f[id]={v:"",s:"",t:0});}
+function hydrate(root){
+  root.querySelectorAll(".fld").forEach(function(el){
+    var id=el.dataset.f,d=F[id],inp;
+    if(d.type==="select"){inp=document.createElement("select");inp.innerHTML='<option value="">—</option>'+d.options.map(function(o){return '<option>'+o+'</option>';}).join("");}
+    else{inp=document.createElement("input");inp.type="text";inp.autocomplete="off";inp.spellcheck=false;inp.setAttribute("autocapitalize","off");
+      var L=Math.max.apply(null,d.answers.map(function(a){return a.length;}));inp.style.width=Math.max(6,L+3)+"ch";if(d.wide)inp.classList.add("wide");}
+    inp.id="f-"+id;inp.classList.add("in");inp.setAttribute("aria-label",d.label||"respuesta");
+    var st=S.f[id];if(st&&st.v)inp.value=st.v;
+    inp.addEventListener(d.type==="select"?"change":"input",function(){ensure(id).v=inp.value;inp.classList.remove("bad");save();});
+    if(d.type!=="select")inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();checkGroup(d.g);}});
+    el.replaceWith(inp);d.el=inp;applyField(id);
+  });
+  root.querySelectorAll(".grp").forEach(function(el){
+    var gid=el.dataset.g;
+    el.innerHTML='<div class="grp-row"><button class="btn" type="button" data-act="check">Revisar</button><button class="btn warn" type="button" data-act="reveal" hidden>Ver respuestas</button></div><div class="fb" aria-live="polite"></div>';
+    el.querySelector('[data-act="check"]').addEventListener("click",function(){checkGroup(gid);});
+    el.querySelector('[data-act="reveal"]').addEventListener("click",function(){revealGroup(gid);});
+    groupFeedback(gid,null);
+  });
+  root.querySelectorAll(".mcq").forEach(function(el){renderMC(el,el.dataset.mc);});
+}
+function applyField(id){
+  var d=F[id],el=d.el,st=S.f[id];if(!el)return;
+  el.classList.remove("ok","fixed","rev","bad");
+  if(!st)return;
+  if(st.s==="correct")el.classList.add("ok");else if(st.s==="fixed")el.classList.add("fixed");else if(st.s==="revealed")el.classList.add("rev");else if(st.t>0)el.classList.add("bad");
+  if(done(st.s)){if(d.type==="select")el.disabled=true;else el.readOnly=true;}
+}
+function evalField(id){
+  var d=F[id],v=d.el.value;
+  if(d.type==="select")return {ok:v===d.answers[0]};
+  if(d.validate)return {ok:d.validate(v)};
+  var a=norm(v,true,d.pro),b=norm(v,false,d.pro),i;
+  for(i=0;i<d.answers.length;i++)if(norm(d.answers[i],true,d.pro)===a)return {ok:true};
+  for(i=0;i<d.answers.length;i++)if(norm(d.answers[i],false,d.pro)===b)return {ok:true,note:d.answers[i]};
+  return {ok:false};
+}
+function groupIds(gid){return Object.keys(F).filter(function(k){return F[k].g===gid;});}
+function checkGroup(gid){
+  var ids=groupIds(gid),pending=ids.filter(function(k){return !done((S.f[k]||{}).s);});
+  if(!pending.length)return;
+  var empty=pending.filter(function(k){return !F[k].el.value.trim();});
+  if(empty.length){groupFeedback(gid,{empty:true});F[empty[0]].el.focus();return;}
+  var hints=[],notes=[];
+  pending.forEach(function(k){var r=evalField(k),st=ensure(k);st.v=F[k].el.value;st.t=(st.t||0)+1;
+    if(r.ok){st.s=st.t===1?"correct":"fixed";if(r.note)notes.push(r.note);}else{if(F[k].hint)hints.push(F[k].hint);}
+    applyField(k);});
+  S.g[gid]=(S.g[gid]||0)+1;save();groupFeedback(gid,{hints:hints,notes:notes});refresh();
+}
+function revealGroup(gid){
+  groupIds(gid).forEach(function(k){var st=ensure(k);if(!done(st.s)){st.s="revealed";st.v=F[k].answers[0];F[k].el.value=F[k].answers[0];applyField(k);}});
+  save();groupFeedback(gid,{revealed:true});refresh();
+}
+function groupFeedback(gid,info){
+  var el=document.querySelector('.grp[data-g="'+gid+'"]');if(!el)return;
+  var fb=el.querySelector(".fb"),rv=el.querySelector('[data-act="reveal"]'),ck=el.querySelector('[data-act="check"]');
+  var ids=groupIds(gid),left=ids.filter(function(k){return !done((S.f[k]||{}).s);}).length,tries=S.g[gid]||0;
+  var anyRev=ids.some(function(k){return (S.f[k]||{}).s==="revealed";});
+  fb.className="fb";rv.hidden=true;ck.disabled=false;
+  if(!left){ck.disabled=true;
+    if(anyRev){fb.innerHTML="The answers in yellow are the correct ones. Read them and copy any you missed into your notebook.";}
+    else{fb.className="fb good";var h="¡Muy bien! Todo correcto.";
+      if(info&&info.notes&&info.notes.length)h+='<ul><li>Watch the accents: '+info.notes.map(esc).join(" · ")+'</li></ul>';fb.innerHTML=h;}
+    return;}
+  if(info&&info.empty){fb.className="fb try";fb.textContent="Fill in every blank first, then press Revisar.";}
+  else if(tries>0){fb.className="fb try";
+    var h2="Todavía no. Fix the "+(left===1?"answer":left+" answers")+" in red and try again.";
+    var hs=(info&&info.hints)||[];hs=hs.filter(function(x,i){return hs.indexOf(x)===i;});
+    if(hs.length)h2+='<ul>'+hs.map(function(x){return '<li>Pista: '+esc(x)+'</li>';}).join("")+'</ul>';
+    fb.innerHTML=h2;}
+  if(tries>=2)rv.hidden=false;
+}
+function renderMC(el,id){
+  var d=MC[id],st=S.mc[id]||{s:"",t:0,wrong:[]};
+  el.innerHTML='<p class="mc-q">'+d.q+'</p><div class="mc-opts" role="group">'+d.options.map(function(o,i){return '<button type="button" class="opt" data-i="'+i+'">'+esc(o)+'</button>';}).join("")+'</div><p class="fb" aria-live="polite"></p>';
+  var btns=el.querySelectorAll(".opt"),fb=el.querySelector(".fb");
+  function paint(){
+    btns.forEach(function(b,i){b.classList.toggle("bad",st.wrong.indexOf(i)>-1);if(st.wrong.indexOf(i)>-1)b.disabled=true;
+      if(done(st.s)){b.disabled=true;if(i===d.correct)b.classList.add("ok");}});
+    if(done(st.s)){fb.className="fb good";fb.textContent=(st.s==="correct"?"¡Correcto! ":"Ahora sí. ")+d.why;}
+    else if(st.t>0){fb.className="fb try";fb.textContent="Todavía no. Try another answer.";}
+  }
+  btns.forEach(function(b){b.addEventListener("click",function(){
+    var i=+b.dataset.i;st.t++;
+    if(i===d.correct)st.s=st.t===1?"correct":"fixed";else st.wrong.push(i);
+    S.mc[id]=st;save();paint();refresh();});});
+  paint();
+}
+
+/* ---------- step status ---------- */
+function stepItems(i){var sec=SECTIONS[i];
+  var fs=[].map.call(sec.querySelectorAll(".in[id^='f-']"),function(e){return e.id.slice(2);});
+  var ms=[].map.call(sec.querySelectorAll(".mcq"),function(e){return e.dataset.mc;});
+  return {fs:fs,ms:ms};}
+function stepReady(i){
+  var s=STEPS[i];if(s.ready&&!s.ready())return false;
+  var it=stepItems(i);
+  return it.fs.every(function(k){return done((S.f[k]||{}).s);})&&it.ms.every(function(k){return done((S.mc[k]||{}).s);});
+}
+function stepScore(i){
+  var it=stepItems(i),r={c:0,x:0,v:0,n:0};
+  it.fs.forEach(function(k){var s=(S.f[k]||{}).s;r.n++;if(s==="correct")r.c++;else if(s==="fixed")r.x++;else if(s==="revealed")r.v++;});
+  it.ms.forEach(function(k){var s=(S.mc[k]||{}).s;r.n++;if(s==="correct")r.c++;else if(s==="fixed")r.x++;});
+  return r;
+}
+
+/* ---------- navigation ---------- */
+var rail=document.getElementById("rail"),back=document.getElementById("back"),next=document.getElementById("next"),botmsg=document.getElementById("botmsg"),who=document.getElementById("who");
+function go(i){
+  if(i<0||i>=STEPS.length||i>S.max)return;
+  S.step=i;save();
+  SECTIONS.forEach(function(sec,j){sec.hidden=j!==i;});
+  if(STEPS[i].id==="final"){if(!S.finished){S.finished=new Date().toISOString();save();}STEPS[i].after(SECTIONS[i]);}
+  window.scrollTo(0,0);refresh();
+  var c=rail.querySelector('.chip[data-i="'+i+'"]');if(c&&c.scrollIntoView)c.scrollIntoView({block:"nearest",inline:"center"});
+}
+function refresh(){
+  var i=S.step,ready=stepReady(i);
+  if(ready&&S.max===i&&i<STEPS.length-1){/* unlock next */}
+  rail.innerHTML=STEPS.map(function(s,j){var cls="chip"+(j===i?" cur":(stepReady(j)&&j<=S.max&&j!==STEPS.length-1?" done":""));
+    return '<button type="button" class="'+cls+'" data-i="'+j+'"'+(j>S.max?" disabled":"")+'><span class="n">'+(j===0?"★":j===STEPS.length-1?"✓":j)+'</span>'+s.title+'</button>';}).join("");
+  back.disabled=i===0;
+  var last=i===STEPS.length-1;
+  next.hidden=last;next.disabled=!ready;
+  next.textContent=i===STEPS.length-2?"Terminar →":(i===0?"Empezar →":"Siguiente →");
+  botmsg.textContent=last?"Take your screenshot now.":(ready?"":(STEPS[i].why||"Finish every question to continue."));
+  who.innerHTML=S.name?('<b>'+esc(S.name)+'</b>'+(S.period?' · Período '+esc(S.period):'')):"";
+}
+rail.addEventListener("click",function(e){var b=e.target.closest(".chip");if(b&&!b.disabled)go(+b.dataset.i);});
+back.addEventListener("click",function(){go(S.step-1);});
+next.addEventListener("click",function(){if(!stepReady(S.step))return;if(S.max<S.step+1)S.max=S.step+1;go(S.step+1);});
+document.addEventListener("click",function(e){var b=e.target.closest(".say");if(b)speak(b.dataset.say);});
+
+/* ---------- final ---------- */
+function renderFinal(box){
+  var rows="",tot={c:0,x:0,v:0,n:0};
+  for(var i=1;i<STEPS.length-1;i++){var r=stepScore(i);if(STEPS[i].id==="tuperfil")continue;
+    tot.c+=r.c;tot.x+=r.x;tot.v+=r.v;tot.n+=r.n;
+    rows+='<tr><td>'+i+'. '+STEPS[i].title+'</td><td class="num">'+r.c+'</td><td class="num">'+r.x+'</td><td class="num">'+r.v+'</td><td class="num">'+r.n+'</td></tr>';}
+  var fin=S.finished?new Date(S.finished):new Date();
+  var when=fin.toLocaleDateString("es-US",{weekday:"long",day:"numeric",month:"long"})+" · "+fin.toLocaleTimeString("es-US",{hour:"numeric",minute:"2-digit"});
+  var pct=tot.n?Math.round((tot.c+tot.x)/tot.n*100):0;
+  box.innerHTML='<h2>¡Terminaste! Take your screenshot.</h2>'+
+  '<p class="lead">Take a screenshot of the box below and upload it to Canvas under <b>“Rotación 8: Lección en línea.”</b></p>'+
+  '<div class="card summary"><div class="sum-head"><div class="sum-name">'+esc(S.name||"(sin nombre)")+'</div><div class="sum-meta">Período '+esc(S.period||"?")+' · '+when+'</div></div>'+
+  '<div class="tbl-wrap"><table class="sum-tbl"><thead><tr><th>Paso</th><th>1st try</th><th>Fixed</th><th>Shown</th><th>Total</th></tr></thead><tbody>'+rows+
+  '<tr><td><b>Total</b></td><td class="num"><b>'+tot.c+'</b></td><td class="num"><b>'+tot.x+'</b></td><td class="num"><b>'+tot.v+'</b></td><td class="num"><b>'+tot.n+'</b></td></tr></tbody></table></div>'+
+  '<div class="total">'+pct+'% answered correctly on my own</div>'+
+  '<div><b>Mi perfil</b><div class="profile-out es">'+esc(S.profile||"")+'</div></div></div>'+
+  '<div class="two"><div class="card"><h3>How to take a screenshot</h3><ul class="clean"><li><b>Chromebook:</b> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Show windows</kbd>, then drag over the box</li><li><b>Windows:</b> <kbd>Windows</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></li><li><b>Mac:</b> <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>4</kbd></li></ul></div>'+
+  '<div class="card"><h3>Before you leave</h3><ul class="clean"><li>Get the worksheet <b>“¿Quién eres? ¿Qué tienes que hacer?”</b> from your teacher.</li><li><b>Tarea:</b> finish all 3 pages and <b>upload a photo of the completed worksheet to Canvas</b>.</li><li><b>Study for Quiz 2 on tener.</b> It is next class. Study resources are on Canvas.</li></ul></div></div>';
+}
+
+/* ---------- start ---------- */
+if(S.step>S.max)S.max=S.step;
+go(Math.min(S.step||0,STEPS.length-1));
+})();
+</script>
+</body>
+</html>
